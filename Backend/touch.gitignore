@@ -4,5 +4,5 @@
 .env.development
 .env.production
 package-lock.json
-package.json;
+package.json
 
