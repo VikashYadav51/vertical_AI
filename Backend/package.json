@@ -1,0 +1,27 @@
+{
+  "name": "vertical_ai_project",
+  "version": "1.0.0",
+  "description": "Authentication systum",
+  "keywords": [
+    "JWT",
+    "0Auth2",
+    "Node.js",
+    "Express.js",
+    "MongoDB"
+  ],
+  "homepage": "https://github.com/VikashYadav51/vertical_AI#readme",
+  "bugs": {
+    "url": "https://github.com/VikashYadav51/vertical_AI/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VikashYadav51/vertical_AI.git"
+  },
+  "license": "ISC",
+  "author": "VIKSH YADAV",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon  src/index.js"
+  }
+}
