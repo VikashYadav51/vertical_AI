@@ -25,17 +25,21 @@
     "start": "nodemon  src/index.js"
   },
   "dependencies": {
+    "@types/passport-google-oauth20": "^2.0.17",
     "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "express-session": "^1.19.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.3.1",
     "multer": "^2.1.1",
     "nodemailer": "^8.0.3",
     "nodemon": "^3.1.14",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
     "router": "^2.2.0"
   }
 }
