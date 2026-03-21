@@ -1,9 +1,11 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import authRouter from './router/user.router.js';
 import session from 'express-session';
 import passport from 'passport';
+
+import userRouter from './router/user.router.js';
+import authRouter from './router/authRouter.js';
 
 const app = express();
 
@@ -33,6 +35,7 @@ app.use(passport.session());
 
 // routes
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/users', userRouter);
 
 
 

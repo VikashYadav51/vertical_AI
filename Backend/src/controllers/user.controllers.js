@@ -207,6 +207,7 @@ export {
     logoutUser,
     updatePassword,
     refreshAccessToken,
+    generateAccessAndRefreshTokens,
 }
 
 
