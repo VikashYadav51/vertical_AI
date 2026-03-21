@@ -15,18 +15,22 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
           let user = await User.findOne({ googleId: profile.id });
 
           if (!user) {
-            user = await User.create({
-              googleId: profile.id,
-              fullName: profile.displayName,
-              email: profile.emails?.[0]?.value,
-              isVerified: true,
-            });
+              user = await User.create({
+                  googleId: profile.id,
+                  fullName: profile.displayName,
+                  email: profile.emails?.[0]?.value,
+                  isVerified: true,
+                }
+              );
           }
 
           return done(null, user);
-        } catch (err) {
+        } 
+
+        catch (err) {
           return done(err, null);
         }
+        
       },
     ),
   );
