@@ -68,7 +68,7 @@ userSchema.methods.isPasswordCorrect = async function(password) {
     return hashedPassword;
 };
 
-userSchema.methods.accessToken = function () {
+userSchema.methods.accessToken =  async() =>{
     return jwt.sign(
         { 
             _id: this._id,
@@ -76,16 +76,19 @@ userSchema.methods.accessToken = function () {
             fullName: this.fullName,
             role: this.role,
         },
+
         process.env.ACCESS_TOKEN_SECRET,
+
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRY },
     );
 };
 
-userSchema.methods.refreshTokens = function () {
+userSchema.methods.refreshTokens =  async () => {
     return jwt.sign(
         {
             _id: this._id,
         },
+
         process.env.REFRESH_TOKEN_SECRET,
 
         { expiresIn: process.env.REFRESH_TOKEN_EXPIRY}
@@ -94,8 +97,13 @@ userSchema.methods.refreshTokens = function () {
 
 userSchema.methods.createEmailVerificationToken = function () {
     const token = crypto.randomBytes(32).toString('hex');
-    this.emailVerificationToken = crypto.createHash('sha256').update(token).digest('hex');
-    this.emailVerificationExpires = Date.now() + 1000 * 60 * 60; // 1 hour
+    
+    this.emailVerificationToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+    
+    this.emailVerificationExpires = Date.now() + 1000 * 60 * 60; 
     return token;
 };
 
