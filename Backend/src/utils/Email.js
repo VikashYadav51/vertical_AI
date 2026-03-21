@@ -1,28 +1,50 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.ethereal.email",
-  port: 587,
-  secure: false, // Use true for port 465, false for port 587
-  auth: {
-    user: "maddison53@ethereal.email",
-    pass: "jn7jnAPss4f63QBp6D",
-  },
-});
+let cachedTransporter;
+const getTransporter = async () => {
+  if (cachedTransporter) return cachedTransporter;
 
-const sendEmail = async (options) => {
+  if (process.env.EMAIL_TRANSPORT === 'ethereal' || !process.env.EMAIL_HOST) {
+    const testAccount = await nodemailer.createTestAccount();
+    cachedTransporter = nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
+      auth: {
+        user: testAccount.user,
+        pass: testAccount.pass,
+      },
+    });
+  } else {
+    cachedTransporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: Number(process.env.EMAIL_PORT || 587),
+      secure: String(process.env.EMAIL_SECURE || 'false') === 'true',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+  }
+  return cachedTransporter;
+};
+
+const sendEmail = async ({ to, subject, text, html, from }) => {
+  const transporter = await getTransporter();
   const info = await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: process.env.EMAIL_TO,
-    subject: process.env.EMAIL_SUBJECT,
-    text: process.env.EMAIL_TEXT, // Plain-text version of the message
-    html: process.env.EMAIL_HTML, // HTML version of the message
+    from: from || process.env.EMAIL_FROM || process.env.EMAIL_USER,
+    to,
+    subject,
+    text,
+    html,
   });
 
-  console.log("Message sent:", info.messageId);
-  console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
-}
+  const preview = nodemailer.getTestMessageUrl(info);
+  if (preview) {
+    console.log('Preview URL:', preview);
+  }
+  return info;
+};
 
-
-export { transporter, sendEmail };
+export { getTransporter as transporter, sendEmail };
 

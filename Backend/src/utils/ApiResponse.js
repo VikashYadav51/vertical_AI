@@ -12,3 +12,5 @@ class ApiResponse {
         this.error = null;
     }
 }
+
+export default ApiResponse;

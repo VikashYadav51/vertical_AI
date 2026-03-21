@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import session from 'express-session';
 import passport from 'passport';
+import './OAuth2/oAuth2.js';
 
 import userRouter from './router/user.router.js';
 import authRouter from './router/authRouter.js';

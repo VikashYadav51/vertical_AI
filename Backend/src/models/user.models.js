@@ -1,4 +1,7 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 const userSchema = new mongoose.Schema(
     {
@@ -27,6 +30,18 @@ const userSchema = new mongoose.Schema(
             default : 'user'
         },
         
+        googleId: {
+            type: String,
+        },
+
+        emailVerificationToken: {
+            type: String,
+        },
+
+        emailVerificationExpires: {
+            type: Date,
+        },
+
         isVerified : {
             type : Boolean,
             default : false
@@ -58,12 +73,10 @@ userSchema.methods.accessToken = function () {
         { 
             _id: this._id,
             email: this.email,
-            userName: this.userName,
             fullName: this.fullName,
+            role: this.role,
         },
-
         process.env.ACCESS_TOKEN_SECRET,
-
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRY },
     );
 };
@@ -72,15 +85,18 @@ userSchema.methods.refreshTokens = function () {
     return jwt.sign(
         {
             _id: this._id,
-            email: this.email,
-            userName: this.userName,
-            fullName: this.fullName,
         },
-
         process.env.REFRESH_TOKEN_SECRET,
 
         { expiresIn: process.env.REFRESH_TOKEN_EXPIRY}
     );
+};
+
+userSchema.methods.createEmailVerificationToken = function () {
+    const token = crypto.randomBytes(32).toString('hex');
+    this.emailVerificationToken = crypto.createHash('sha256').update(token).digest('hex');
+    this.emailVerificationExpires = Date.now() + 1000 * 60 * 60; // 1 hour
+    return token;
 };
 
 

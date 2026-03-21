@@ -24,6 +24,17 @@ const verifyJWT = asyncHandler( async(err, req, res, next) =>{
 
     req.user = user;
     next();
-})
+});
 
-export default verifyJWT;
+const requireRoles = (...roles) =>
+    asyncHandler(async (req, res, next) => {
+        if (!req.user) {
+            throw new ApiError(401, 'Unauthorized request');
+        }
+        if (!roles.includes(req.user.role)) {
+            throw new ApiError(403, 'Forbidden: insufficient role');
+        }
+        next();
+    });
+
+export { verifyJWT as default, requireRoles };
