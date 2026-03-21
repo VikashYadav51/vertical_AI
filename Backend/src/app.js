@@ -24,6 +24,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use('/api/v1/auth', authRouter);
 
 
+
 // global error handler
 app.use((err, req, res, next) =>{
     console.log(`Gobal error is ${err}`)
