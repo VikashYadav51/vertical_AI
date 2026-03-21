@@ -10,17 +10,19 @@ const generateAccessAndRefreshTokens = async (userId) => {
     try {
         const user = await User.findById(userId);
         const accessToken = user.accessToken();
-        const refreshToken = user.refreshTokens();
+        const refreshToken = user.refreshToken();
 
         user.refreshToken = refreshToken;
         await user.save({ validateBeforeSave: false });
         return { accessToken, refreshToken };
-    } catch (error) {
+    } 
+    
+    catch (error) {
         throw new ApiError(500, 'Something went wrong while generating tokens', { error });
     }
 }
 
-const registerUser = asyncHandler(async (req, res) => {
+const registerUser = asyncHandler (async (req, res) => {
     const { email, password, fullName } = req.body;
 
     if ([email, password, fullName].some((field) => !field || String(field).trim() === '')) {
@@ -41,14 +43,16 @@ const registerUser = asyncHandler(async (req, res) => {
         fullName,
     });
 
+
+
     const token = user.createEmailVerificationToken();
     await user.save({ validateBeforeSave: false });
 
     const verifyUrl = `${process.env.APP_URL || 'http://localhost:3000'}/api/v1/users/verify-email?token=${token}`;
+
     await sendEmail({
         to: email,
         subject: 'Verify your email',
-        html: `<p>Hello ${fullName},</p><p>Please verify your email by clicking <a href="${verifyUrl}">this link</a>.</p>`,
         text: `Verify your email: ${verifyUrl}`,
     });
 
@@ -58,7 +62,8 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(500, 'Something went wrong while registering the user', { fullName, email });
     }
 
-    return res.status(201).json(new ApiResponse(200, 'User registered successfully. Please verify email.', createdUser));
+    return res.status(201)
+    .json(new ApiResponse(200, 'User registered successfully. Please verify email.', createdUser));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -108,8 +113,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 
     const cookieOption = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+        secure: process.env.NODE_ENV,
+        sameSite: process.env.NODE_ENV,
     };
 
     return res
@@ -151,7 +156,6 @@ const updatePassword = asyncHandler(async (req, res) => {
 
     console.log('savePassword ', savepassword);
 
-
     return res.status(200).json(new ApiResponse(200, 'Password updated successfully', {}));
 });
 
@@ -192,6 +196,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         throw new ApiError(401, error?.message || 'Invalid refresh token');
     }
 });
+
 
 const verifyEmail = asyncHandler(async (req, res) => {
     const { token } = req.query;

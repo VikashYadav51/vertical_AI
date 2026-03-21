@@ -95,9 +95,9 @@ userSchema.methods.refreshTokens =  async () => {
     );
 };
 
-userSchema.methods.createEmailVerificationToken = function () {
+userSchema.methods.createEmailVerificationToken =  () => {
     const token = crypto.randomBytes(32).toString('hex');
-    
+
     this.emailVerificationToken = crypto
         .createHash('sha256')
         .update(token)
