@@ -9,8 +9,8 @@ import { sendEmail } from '../utils/Email.js';
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
         const user = await User.findById(userId);
-        const accessToken = user.accessToken();
-        const refreshToken = user.refreshToken();
+        const accessToken = user.generateAccessToken();
+        const refreshToken = user.generateRefreshToken();
 
         user.refreshToken = refreshToken;
         await user.save({ validateBeforeSave: false });
@@ -63,7 +63,7 @@ const registerUser = asyncHandler (async (req, res) => {
     }
 
     return res.status(201)
-    .json(new ApiResponse(200, 'User registered successfully. Please verify email.', createdUser));
+    .json(new ApiResponse(201, 'User registered successfully. Please verify email.', createdUser));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -95,13 +95,23 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(500, 'Something went wrong while logging in the user', { loginId });
     }
 
-    return res.status(200).json(
-        new ApiResponse(200, 'User logged in successfully', {
-            user: loggedInUser,
-            accessToken,
-            refreshToken,
-        }),
-    );
+    const cookieOption = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+    };
+
+    return res
+        .status(200)
+        .cookie('accessToken', accessToken, cookieOption)
+        .cookie('refreshToken', refreshToken, cookieOption)
+        .json(
+            new ApiResponse(200, 'User logged in successfully', {
+                user: loggedInUser,
+                accessToken,
+                refreshToken,
+            }),
+        );
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
@@ -113,8 +123,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 
     const cookieOption = {
         httpOnly: true,
-        secure: process.env.NODE_ENV,
-        sameSite: process.env.NODE_ENV,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
     };
 
     return res
@@ -184,7 +194,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         const cookieOption = {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+            sameSite: 'lax',
         };
 
         return res
